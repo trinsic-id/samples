@@ -22,7 +22,7 @@ namespace WebApiSample.Controllers
         /// Retrieve a list of registered tenant organizations
         /// </summary>
         /// <returns></returns>
-        [HttpGet("api/tenants")]
+        [HttpGet("api/organizations")]
         public async Task<IEnumerable<TenantContract>> Get()
         {
             return await _client.ListTenantsAsync();
