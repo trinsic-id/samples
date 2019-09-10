@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@streetcred.id/service-clients": "^1.0.3"
+    "@streetcred.id/service-clients": "^1.1.1017"
   },
   "devDependencies": {
     "typescript": "^3.5.3"

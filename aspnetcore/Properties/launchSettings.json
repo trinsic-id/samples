@@ -3,7 +3,7 @@
     "WebApiSample": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/api/tenants",
+      "launchUrl": "http://localhost:5000/api/organizations",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
