@@ -8,4 +8,31 @@ const listOrganizations = async () => {
     result.forEach(org => console.log(org));
 }
 
-listOrganizations()
+const createVerificationDefinition = async () => {
+    var response = await client.createVerificationDefinition({
+        proofRequest: {
+            name: "verification-name",
+            version: "1.0",
+            requestedAttributes: {
+                nameVerification: {
+                    name: "firstName"
+                }
+            }
+        }
+    });
+    var definition = await client.getVerificationDefinition(response.id);
+    console.log(definition);
+}
+
+const createConnectionInvitation = async () => {
+    var invitation = await client.createConnection({
+        connectionInvitationParameters: {}
+    });
+    console.log(invitation);
+} 
+
+listOrganizations();
+
+createVerificationDefinition();
+
+createConnectionInvitation();
