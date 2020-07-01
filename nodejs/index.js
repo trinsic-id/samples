@@ -1,4 +1,4 @@
-const { AgencyServiceClient, Credentials } = require("@streetcred.id/service-clients");
+const { CredentialsServiceClient: CredentialsServiceClient, Credentials } = require("@trinsic/service-clients");
 
 const client = new AgencyServiceClient(new Credentials("<access token>", "<subscription key>"), { noRetryPolicy: true });
 

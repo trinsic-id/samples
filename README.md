@@ -9,10 +9,10 @@ Available samples:
 
 ### Nuget
 
-The [package](https://www.nuget.org/packages/Streetcred.ServiceClients/) is available for `.netstandard2.0` and up.
+The [package](https://www.nuget.org/packages/Trinsic.ServiceClients/) is available for `.netstandard2.0` and up.
 
 ```cmd
-dotnet add package Streetcred.ServiceClients
+dotnet add package Trinsic.ServiceClients
 ```
 
 ### NPM
@@ -20,7 +20,7 @@ dotnet add package Streetcred.ServiceClients
 The package contains type definitions for typescript.
 
 ```cmd
-npm install @streetcred.id/service-clients
+npm install --save @trinsic/service-clients
 ```
 
 Please open an issue in this repo for any questions or issues running these packages.

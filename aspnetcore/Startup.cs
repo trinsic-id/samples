@@ -26,11 +26,11 @@ namespace WebApiSample
         public void ConfigureServices(IServiceCollection services)
         {
             // Add service client dependencies
-            services.AddStreetcredClient(options =>
-            {
+            services.AddTrinsicClient(options => {
                 // Add the values below from the developer portal
                 options.AccessToken = "<access token>";
                 options.SubscriptionKey = "<subscription key>";
+                options.AccountSecret = "<account secret>";
             });
             services.AddMvc();
         }
