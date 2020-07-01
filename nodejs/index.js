@@ -1,6 +1,6 @@
 const { CredentialsServiceClient: CredentialsServiceClient, Credentials } = require("@trinsic/service-clients");
 
-const client = new AgencyServiceClient(new Credentials("<access token>", "<subscription key>"), { noRetryPolicy: true });
+const client = new CredentialsServiceClient(new Credentials("<access token>", "<subscription key>"), { noRetryPolicy: true });
 
 const listOrganizations = async () => {
     var result = await client.listTenants();
