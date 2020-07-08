@@ -1,8 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 const { CredentialsServiceClient, Credentials, WalletServiceClient } = require("@trinsic/service-clients");
+const readline = require('readline');
 
-const accessToken = '<access token>';
-const subscriptionKey = '<subscription key>';
+accessToken = '<Access Token>';
+const subscriptionKey = '<Subscription Key>';
 
 const credentialsClient = new CredentialsServiceClient(
     new Credentials(accessToken, subscriptionKey),
@@ -13,6 +14,19 @@ const walletClient = new WalletServiceClient(
     new Credentials(accessToken, subscriptionKey),
     { noRetryPolicy: true }
 );
+
+// Wait for user input
+function waitForInput(query) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    return new Promise(resolve => rl.question(query, ans => {
+        rl.close();
+        resolve(ans);
+    }))
+}
 
 // Create a wallet
 async function createWallet() {
@@ -134,7 +148,7 @@ async function revokeCredential(credentialId) {
 }
 
 // Check that a revocable credential is valid prior to revocation
-async function testIsValid() {
+async function testIsValidWithCloudWallet() {
     const wallet = await createWallet();
 
     const connection = await createConnection();
@@ -167,7 +181,7 @@ async function testIsValid() {
 }
 
 // Check that a revocable credential is valid prior to revocation
-async function testIsInvalid() {
+async function testIsInvalidWithCloudWallet() {
     const wallet = await createWallet();
 
     const connection = await createConnection();
@@ -201,6 +215,70 @@ async function testIsInvalid() {
     }
 }
 
-testIsValid().then();
-console.log('\n');
-testIsInvalid().then();
+async function testIsValidWithMobileWallet(){
+    console.log("************ Test non-revoked credentials pass verification **********")
+    const connection = await createConnection();
+    console.log(`Connection url: ${connection.invitationUrl}`);
+    console.log(connection.invitation);
+    await waitForInput('Press any key to continue after accepting the connection\n');
+
+    const attributeNames = ["first", "second", "third"];
+    const definition = await createCredentialDefinition(attributeNames);
+    await createCredential(definition.definitionId, connection.connectionId);
+    await waitForInput('Press any key to continue after accepting the offer\n');
+    
+    const verification = await sendVerification(connection.connectionId);
+    await waitForInput('Press any key to continue after presenting the verification\n');
+
+    const verificationUpdate = await getVerification(verification.verificationId);
+    console.log("Verification:\n");
+    console.log(verificationUpdate);
+
+    // Check that the isValid = true in the verification
+    console.log("*********************\nResults:")
+    if (verificationUpdate.isValid) {
+        console.log('\nTest Passed\nVerification is valid');
+    } else {
+        console.log('\nTest Failed\nVerification is invalid');
+    }
+}
+
+async function testIsInvalidWithMobileWallet(){
+    console.log("************ Test revoked credentials fail verification **********")
+    const connection = await createConnection();
+    console.log(`Connection url: ${connection.invitationUrl}`);
+    console.log(connection.invitation);
+    await waitForInput('Press any key to continue after accepting the connection\n');
+
+    const attributeNames = ["first", "second", "third"];
+    const definition = await createCredentialDefinition(attributeNames);
+    const credential = await createCredential(definition.definitionId, connection.connectionId);
+    await waitForInput('Press any key to continue after accepting the offer\n');
+    
+    console.log("revoking credential...");
+    await revokeCredential(credential.credentialId);
+    console.log("...success");
+    console.log("sending verification...");
+    const verification = await sendVerification(connection.connectionId);
+    await waitForInput('Press any key to continue after presenting the verification\n');
+
+    const verificationUpdate = await getVerification(verification.verificationId);
+    console.log("Verification:\n");
+    console.log(verificationUpdate);
+
+    // Check that the isValid = false in the verification
+    console.log("*********************\nResults:")
+    if (!verificationUpdate.isValid) {
+        console.log('\nTest Passed\nVerification is invalid');
+    } else {
+        console.log('\nTest Failed\nVerification is valid');
+    }
+}
+
+
+
+// testIsValidWithCloudWallet().then();
+// testIsInvalidWithCloudWallet().then();
+
+testIsValidWithMobileWallet().then();
+// testIsInvalidWithMobileWallet().then();

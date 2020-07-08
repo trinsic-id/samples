@@ -5,6 +5,19 @@ Available samples:
 - AspNetCore sample using WebApi
 - Nodejs sample using NPM package
 
+## How to run the NodeJs Samples
+Prerequisites:
+- install npm
+
+### Revocation Sample
+Go to the nodejs directory.
+
+In the `revocation-test.js` file, uncomment the test you would like to run. 
+
+Run these commands
+- `npm install`
+- `node revocation-test.js`
+
 ## Packages
 
 ### Nuget
