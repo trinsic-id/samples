@@ -10,9 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@trinsic/service-clients": "^1.1.3745"
+    "@trinsic/service-clients": "^1.1.3745",
+    "uuid": "^8.2.0"
   },
   "devDependencies": {
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.6"
   }
 }
