@@ -29,8 +29,7 @@ namespace WebApiSample
             services.AddTrinsicClient(options => {
                 // Add the values below from the developer portal
                 options.AccessToken = "<access token>";
-                options.SubscriptionKey = "<subscription key>";
-                options.AccountSecret = "<account secret>";
+                options.ProviderKey = "<provider key>";
             });
             services.AddMvc();
         }

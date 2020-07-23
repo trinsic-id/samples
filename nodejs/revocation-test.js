@@ -1,37 +1,42 @@
 const { v4: uuidv4 } = require('uuid');
-const { CredentialsServiceClient, Credentials, WalletServiceClient } = require("@trinsic/service-clients");
+// const { CredentialsServiceClient, Credentials, WalletServiceClient } = require("@trinsic/service-clients");
+const { CredentialsServiceClient, Credentials, WalletServiceClient, ProviderServiceClient, ProviderCredentials } = require("./npm/dist");
 const readline = require('readline');
 
-//const providerKey = '<Provider key>'
-const accessToken = '<Access Token>';
-const subscriptionKey = '<Subscription Key>';
+const providerKey = '<Provider key>'
+// const providerKey = '<Provider key>'
+const accessToken = '_Y-VuFGHBjZlFSDlbAHbnNIrWcc_a4nnUHHiZFceiIY';
 
 const credentialsClient = new CredentialsServiceClient(
-    new Credentials(accessToken, subscriptionKey),
+    new Credentials(accessToken),
     { noRetryPolicy: true }
 );
 
 const walletClient = new WalletServiceClient(
-    new Credentials(accessToken, subscriptionKey),
+    new Credentials(accessToken),
     { noRetryPolicy: true }
 );
 
-// const providerClient = new ProviderServiceClient(
-//     new Credentials(providerKey, subscriptionKey),
-//     { noRetryPolicy: true }
-// );
+const providerClient = new ProviderServiceClient(
+    new ProviderCredentials(providerKey),
+    { noRetryPolicy: true }
+);
 
-// async function createOrg() {
-//     return await providerClient.createTenant();
-// }
+async function createOrg() {
+    return providerClient.createTenant({
+        name: uuidv4(),
+        networkId: 'sovrin-staging',
+        endorserType: 'Shared'
+    });
+}
 
-// async function deleteOrg(tenantId) {
-//     return await providerClient.deleteTenant(tenantId);
-// }
+async function deleteOrg(tenantId) {
+    return providerClient.deleteTenant(tenantId);
+}
 
-// async function getTenantKeys(tenantId){
-//     return providerClient.getTenantKeys(tenantId);
-// }
+async function getTenantKeys(tenantId){
+    return providerClient.getTenantKeys(tenantId);
+}
 
 // Wait for user input
 function waitForInput(query) {
@@ -48,20 +53,13 @@ function waitForInput(query) {
 
 // Create a wallet
 async function createWallet() {
-    const walletName = uuidv4();
-    return walletClient.createWallet({
-        walletParameters: {
-            ownerName: walletName
-        }
-    });
+    return walletClient.createWallet({});
 }
 
 // Create a connection
 async function createConnection() {
     return credentialsClient.createConnection({
-        connectionInvitationParameters: {
-            multiParty: false
-        }
+        multiParty: false
     });
 }
 
@@ -75,13 +73,11 @@ async function createCredentialDefinition(attributeNames) {
     const definitionName = uuidv4();
     const definitionTag = uuidv4();
     return credentialsClient.createCredentialDefinition({
-        credentialDefinitionFromSchemaParameters: {
-            name: definitionName,
-            version: "1.0",
-            attributes: attributeNames,
-            supportRevocation: true,
-            tag: definitionTag
-        }
+        name: definitionName,
+        version: "1.0",
+        attributes: attributeNames,
+        supportRevocation: true,
+        tag: definitionTag
     });
 }
 
@@ -89,15 +85,13 @@ async function createCredentialDefinition(attributeNames) {
 async function createCredential(definitionId, connectionId) {
     const attributeValues = [uuidv4(), uuidv4(), uuidv4()];
     return credentialsClient.createCredential({
-        credentialOfferParameters: {
-            definitionId: definitionId,
-            connectionId: connectionId,
-            automaticIssuance: true,
-            credentialValues: {
-                first: attributeValues[0],
-                second: attributeValues[1],
-                third: attributeValues[2]
-            }
+        definitionId: definitionId,
+        connectionId: connectionId,
+        automaticIssuance: true,
+        credentialValues: {
+            first: attributeValues[0],
+            second: attributeValues[1],
+            third: attributeValues[2]
         }
     });
 }
@@ -121,7 +115,7 @@ async function sendVerification(connectionId) {
     const verificationName = uuidv4();
     const policyName = uuidv4();
     return credentialsClient.sendVerificationFromParameters(connectionId, {
-        verificationPolicyParameters: {
+        body: {
             name: verificationName,
             version: "1.0",
             attributes: [
@@ -244,7 +238,7 @@ async function testIsValidWithMobileWallet(){
     const definition = await createCredentialDefinition(attributeNames);
     await createCredential(definition.definitionId, connection.connectionId);
     await waitForInput('Press any key to continue after accepting the offer\n');
-    
+
     const verification = await sendVerification(connection.connectionId);
     await waitForInput('Press any key to continue after presenting the verification\n');
 
@@ -272,7 +266,7 @@ async function testIsInvalidWithMobileWallet(){
     const definition = await createCredentialDefinition(attributeNames);
     const credential = await createCredential(definition.definitionId, connection.connectionId);
     await waitForInput('Press any key to continue after accepting the offer\n');
-    
+
     console.log("revoking credential...");
     await revokeCredential(credential.credentialId);
     console.log("...success");
@@ -411,7 +405,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     console.log("credential: ");
     console.log(credential);
     await waitForInput('Press any key to continue after accepting the offer\n');
-    
+
     const verification = await sendVerification(connection.connectionId);
 
     await waitForInput('Press any key to continue after presenting the verification\n');
@@ -460,7 +454,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     console.log("credential2: ");
     console.log(credential2)
     await waitForInput('Press any key to continue after accepting the offer\n');
-    
+
     const verification2 = await sendVerification(connection2.connectionId);
     await waitForInput('Press any key to continue after presenting the verification\n');
     const verificationUpdate2 = await getVerification(verification2.verificationId);
@@ -478,12 +472,12 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
 }
 
 
-// testIsValidWithCloudWallet().then();
-// testIsInvalidWithCloudWallet().then();
+testIsValidWithCloudWallet().then();
+testIsInvalidWithCloudWallet().then();
 
-testIsValidWithMobileWallet().then().catch(
-    (error) => {
-        console.error(error);
-    }
-);
+// testIsValidWithMobileWallet().then().catch(
+//     (error) => {
+//         console.error(error);
+//     }
+// );
 // testIsInvalidWithMobileWallet().then();
