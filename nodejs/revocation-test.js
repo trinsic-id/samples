@@ -47,6 +47,7 @@ function waitForInput(query) {
 
     return new Promise(resolve => rl.question(query, ans => {
         rl.close();
+        console.log("OK - continuing ...")
         resolve(ans);
     }))
 }
@@ -122,12 +123,41 @@ async function sendVerification(connectionId) {
                 {
                     policyName: policyName,
                     attributeNames: [
-                        'first',
-                        'second',
+//                        'first',
+//                        'second',
                         'third'
                     ]
                 }
             ],
+            revocationRequirement: {
+                validAt: new Date()
+            }
+        }
+    });
+}
+
+// Send verification from parameters
+async function sendVerificationWithCredentialDefinitionId(connectionId, credentialDefinitionId) {
+    const verificationName = uuidv4();
+    const policyName = uuidv4();
+    return credentialsClient.sendVerificationFromParameters(connectionId, {
+        verificationPolicyParameters: {
+            name: verificationName,
+            version: "1.0",
+            attributes: [
+                {
+                    policyName: policyName,
+                    attributeNames: [
+                        'first'
+                    ],
+                    restrictions: [
+                        {
+                          credentialDefinitionId: credentialDefinitionId
+                        }
+                    ]
+                }
+            ],
+
             revocationRequirement: {
                 validAt: new Date()
             }
@@ -406,7 +436,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     console.log(credential);
     await waitForInput('Press any key to continue after accepting the offer\n');
 
-    const verification = await sendVerification(connection.connectionId);
+    const verification = await sendVerificationWithCredentialDefinitionId(connection.connectionId, definition.definitionId);
 
     await waitForInput('Press any key to continue after presenting the verification\n');
 
@@ -427,7 +457,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     await revokeCredential(credential.credentialId);
     console.log("...success");
     console.log("sending verification...");
-    const verificationRevoked = await sendVerification(connection.connectionId);
+    const verificationRevoked = await sendVerificationWithCredentialDefinitionId(connection.connectionId, definition.definitionId);
     await waitForInput('Press any key to continue after presenting the verification\n');
 
     const verificationRevokedUpdate = await getVerification(verificationRevoked.verificationId);
@@ -455,7 +485,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     console.log(credential2)
     await waitForInput('Press any key to continue after accepting the offer\n');
 
-    const verification2 = await sendVerification(connection2.connectionId);
+    const verification2 = await sendVerificationWithCredentialDefinitionId(connection2.connectionId, definition.definitionId);
     await waitForInput('Press any key to continue after presenting the verification\n');
     const verificationUpdate2 = await getVerification(verification2.verificationId);
     console.log("Verification2:\n");
@@ -480,4 +510,11 @@ testIsInvalidWithCloudWallet().then();
 //         console.error(error);
 //     }
 // );
+
 // testIsInvalidWithMobileWallet().then();
+
+testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_MobileWallet().then().catch(
+    (error) => {
+        console.error(error);
+    }
+);
