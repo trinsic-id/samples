@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace WebApiSample
 {
@@ -28,9 +20,8 @@ namespace WebApiSample
             // Add service client dependencies
             services.AddTrinsicClient(options => {
                 // Add the values below from the developer portal
-                options.AccessToken = "<access token>";
-                options.SubscriptionKey = "<subscription key>";
-                options.AccountSecret = "<account secret>";
+                options.AccessToken = "<access_token>";
+                options.ProviderKey = "<provider_key>";
             });
             services.AddMvc();
         }
