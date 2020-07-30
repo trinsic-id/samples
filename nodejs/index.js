@@ -1,6 +1,6 @@
 const { CredentialsServiceClient: CredentialsServiceClient, Credentials } = require("@trinsic/service-clients");
 
-const client = new CredentialsServiceClient(new Credentials("<access token>"), { noRetryPolicy: true });
+const client = new CredentialsServiceClient(new Credentials("<access_token>"), { noRetryPolicy: true });
 
 const listOrganizations = async () => {
     var result = await client.listTenants();
@@ -34,7 +34,7 @@ const createVerificationPolicy = async () => {
 }
 
 const createConnectionInvitation = async () => {
-    var invitation = await client.createConnection();
+    var invitation = await client.createConnection({});
     console.log(invitation);
 }
 
