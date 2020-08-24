@@ -1,15 +1,19 @@
 const { v4: uuidv4 } = require('uuid');
 // const { CredentialsServiceClient, Credentials, WalletServiceClient } = require("@trinsic/service-clients");
-const { CredentialsServiceClient, Credentials, WalletServiceClient, ProviderServiceClient, ProviderCredentials } = require("./npm/dist");
+const { CredentialsServiceClient, Credentials, WalletServiceClient, ProviderServiceClient, ProviderCredentials } = require("@trinsic/service-clients");
 const readline = require('readline');
+// TODO: Use the provider API for this
 
-const providerKey = '<Provider key>'
+//const providerKey = '<Provider key>'
 // const providerKey = '<Provider key>'
-const accessToken = '_Y-VuFGHBjZlFSDlbAHbnNIrWcc_a4nnUHHiZFceiIY';
+const accessToken = '<Access Token>';
 
 const credentialsClient = new CredentialsServiceClient(
     new Credentials(accessToken),
-    { noRetryPolicy: true }
+    { 
+        noRetryPolicy: true,
+        baseUri: "https://api.trinsic.id/" 
+    }
 );
 
 const walletClient = new WalletServiceClient(
@@ -58,7 +62,8 @@ async function createWallet() {
 
 // Create a connection
 async function createConnection() {
-    return credentialsClient.createConnection({
+
+    return await credentialsClient.createConnection({
         multiParty: false
     });
 }
@@ -76,7 +81,7 @@ async function createCredentialDefinition(attributeNames) {
         name: definitionName,
         version: "1.0",
         attributes: attributeNames,
-        supportRevocation: true,
+        supportRevocation: false,
         tag: definitionTag
     });
 }
@@ -114,9 +119,9 @@ async function acceptOfferedCredentials(offeredCredentials, walletId) {
 async function sendVerification(connectionId) {
     const verificationName = uuidv4();
     const policyName = uuidv4();
-    return credentialsClient.sendVerificationFromParameters(connectionId, {
-        body: {
-            name: verificationName,
+    return credentialsClient.sendVerificationFromParameters(connectionId,
+        {
+            name: "verificationName",
             version: "1.0",
             attributes: [
                 {
@@ -132,7 +137,7 @@ async function sendVerification(connectionId) {
                 validAt: new Date()
             }
         }
-    });
+    );
 }
 
 // List available verifications
@@ -234,9 +239,9 @@ async function testIsValidWithMobileWallet(){
     console.log(connection.invitation);
     await waitForInput('Press any key to continue after accepting the connection\n');
 
-    const attributeNames = ["first", "second", "third"];
-    const definition = await createCredentialDefinition(attributeNames);
-    await createCredential(definition.definitionId, connection.connectionId);
+    // const attributeNames = ["first", "second", "third"];
+    // const definition = await createCredentialDefinition(attributeNames);
+    await createCredential("JyXYMSN3zkkLLqYdv9nCpW:3:CL:136027:default", connection.connectionId);
     await waitForInput('Press any key to continue after accepting the offer\n');
 
     const verification = await sendVerification(connection.connectionId);
@@ -262,9 +267,9 @@ async function testIsInvalidWithMobileWallet(){
     console.log(connection.invitation);
     await waitForInput('Press any key to continue after accepting the connection\n');
 
-    const attributeNames = ["first", "second", "third"];
-    const definition = await createCredentialDefinition(attributeNames);
-    const credential = await createCredential(definition.definitionId, connection.connectionId);
+    // const attributeNames = ["first", "second", "third"];
+    // const definition = await createCredentialDefinition(attributeNames);
+    const credential = await createCredential("JyXYMSN3zkkLLqYdv9nCpW:3:CL:136027:default", connection.connectionId);
     await waitForInput('Press any key to continue after accepting the offer\n');
 
     console.log("revoking credential...");
@@ -397,11 +402,13 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     console.log(connection);
     await waitForInput('Press any key to continue after accepting the connection\n');
 
-    const attributeNames = ["first", "second", "third"];
-    const definition = await createCredentialDefinition(attributeNames);
-    console.log("definition: ");
-    console.log(definition);
-    const credential = await createCredential(definition.definitionId, connection.connectionId);
+    // const attributeNames = ["first", "second", "third"];
+    // const definition = await createCredentialDefinition(attributeNames);
+    // console.log("definition: ");
+    // console.log(definition);
+    const credential = await createCredential("JyXYMSN3zkkLLqYdv9nCpW:3:CL:136027:default", connection.connectionId);
+    //const credential = await createCredential("JyXYMSN3zkkLLqYdv9nCpW:3:CL:136012:default", connection.connectionId);
+
     console.log("credential: ");
     console.log(credential);
     await waitForInput('Press any key to continue after accepting the offer\n');
@@ -421,7 +428,6 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     } else {
         console.log('\nTest Failed\nVerification is invalid');
     }
-
 
     console.log("revoking credential...");
     await revokeCredential(credential.credentialId);
@@ -472,8 +478,8 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
 }
 
 
-testIsValidWithCloudWallet().then();
-testIsInvalidWithCloudWallet().then();
+// testIsValidWithCloudWallet().then();
+// testIsInvalidWithCloudWallet().then();
 
 // testIsValidWithMobileWallet().then().catch(
 //     (error) => {
@@ -481,3 +487,24 @@ testIsInvalidWithCloudWallet().then();
 //     }
 // );
 // testIsInvalidWithMobileWallet().then();
+testIsInvalidWithMobileWallet().then().catch(
+    (error) => {
+        console.error(error);
+    }
+);
+
+// testIsInvalidWithMobileWallet().then().catch(
+//     (error) => {
+//         console.error(error);
+//     }
+// );
+/*
+{
+"connectionId":"c2d3a461-5370-44cc-bf9e-719a375e9fad"
+"state":"Invited"
+"invitation":"eyJsYWJlbCI6Ik1vYmlsZSBUZXN0IFRlbmFudCBTdGF0aWMiLCJpbWFnZVVybCI6Imh0dHBzOi8vdHJpbnNpY2FwaWFzc2V0cy5h ..."
+"invitationUrl":"https://redir.streetcred.id/ql2QPDLrxa9d"
+"createdAtUtc":"2020-08-20T21:35:40Z"
+"multiParty":true
+}
+*/
