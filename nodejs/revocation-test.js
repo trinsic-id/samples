@@ -6,7 +6,7 @@ const readline = require('readline');
 
 //const providerKey = '<Provider key>'
 // const providerKey = '<Provider key>'
-const accessToken = '<Access Token>';
+const accessToken = 'MMRp4DF5yoKE40frWRDCBYZdBAPCEaUJOZc6Yvo37ew';
 
 const credentialsClient = new CredentialsServiceClient(
     new Credentials(accessToken),
@@ -21,10 +21,10 @@ const walletClient = new WalletServiceClient(
     { noRetryPolicy: true }
 );
 
-const providerClient = new ProviderServiceClient(
-    new ProviderCredentials(providerKey),
-    { noRetryPolicy: true }
-);
+// const providerClient = new ProviderServiceClient(
+//     new ProviderCredentials(providerKey),
+//     { noRetryPolicy: true }
+// );
 
 async function createOrg() {
     return providerClient.createTenant({
@@ -428,7 +428,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     } else {
         console.log('\nTest Failed\nVerification is invalid');
     }
-
+    await waitForInput('Press any key to revoke the credential\n');
     console.log("revoking credential...");
     await revokeCredential(credential.credentialId);
     console.log("...success");
@@ -456,7 +456,7 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
     console.log(connection2.invitation);
     await waitForInput('Delete your connection and credential, then press any key to continue after accepting the second connection\n');
 
-    const credential2 = await createCredential(definition.definitionId, connection2.connectionId);
+    const credential2 = await createCredential("JyXYMSN3zkkLLqYdv9nCpW:3:CL:136027:default", connection2.connectionId);
     console.log("credential2: ");
     console.log(credential2)
     await waitForInput('Press any key to continue after accepting the offer\n');
@@ -487,7 +487,8 @@ async function testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_Mob
 //     }
 // );
 // testIsInvalidWithMobileWallet().then();
-testIsInvalidWithMobileWallet().then().catch(
+// testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_MobileWallet
+testIssuedCredIsValidWithSameCredDefIdAsPreviouslyRevokedCred_MobileWallet().then().catch(
     (error) => {
         console.error(error);
     }
@@ -498,13 +499,17 @@ testIsInvalidWithMobileWallet().then().catch(
 //         console.error(error);
 //     }
 // );
+
+
 /*
-{
-"connectionId":"c2d3a461-5370-44cc-bf9e-719a375e9fad"
-"state":"Invited"
-"invitation":"eyJsYWJlbCI6Ik1vYmlsZSBUZXN0IFRlbmFudCBTdGF0aWMiLCJpbWFnZVVybCI6Imh0dHBzOi8vdHJpbnNpY2FwaWFzc2V0cy5h ..."
-"invitationUrl":"https://redir.streetcred.id/ql2QPDLrxa9d"
-"createdAtUtc":"2020-08-20T21:35:40Z"
-"multiParty":true
-}
+conn1 a28e929b-e96b-4388-ae6a-d87779d06b7a
+first: 32aa
+verificationId: 0bb445cc-35d9-497c-a006-a096e9b69006
+
+----
+
+conn2: 171c8d57-85ed-4fbb-a4eb-b4ed8d572a6a
+credId: 563b34cf-f077-4cd2-b1c8-42cf9a477e91
+16f
+
 */

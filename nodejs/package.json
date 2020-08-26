@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@trinsic/service-clients": "^1.1.4209",
+    "@trinsic/service-clients": "^1.1.4220",
     "dotenv": "^8.2.0",
     "uuid": "^8.3.0"
   },
