@@ -1,5 +1,5 @@
-# Samples for using Streetcred Service Client packages
-To access the platform and get your access keys, go to the [developer portal](https://developer.streetcred.id) and create a free account.
+# Samples for using Trinsic Service Client packages
+To access the platform and get your access keys, go to the [developer portal](https://studio.trinsic.id) and create a free account.
 
 Available samples:
 - AspNetCore sample using WebApi
